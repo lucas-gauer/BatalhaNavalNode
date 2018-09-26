@@ -1,0 +1,55 @@
+div#interface{
+	position: absolute;
+	margin: auto auto auto auto;
+	border: 5px solid #969696cc;
+	padding: 10px;
+    height: 600px;
+    width: 900px;
+}
+
+div#tlogin{
+	position: relative;
+	margin: auto auto auto auto;
+	border: 5px solid #969696cc;
+	padding: 10px;
+    content: center;
+}
+
+div#lista{
+	position: absolute;
+	left: 950px;
+	top: 25px;
+	border: 5px solid #969696cc;
+	padding: 10px;
+	text-align: left;
+	padding-right: 200px;
+}
+
+div#inimigo{
+	left:497px;
+}
+
+.tabuleiro{
+	top: 175px;
+	position: absolute;
+	border: 1px solid #969696cc;
+	padding: 5px;
+    width: 400px;
+    text-align: center;
+}
+
+.casas{
+	position: relative;
+	border: 1px solid #969696cc;
+	padding: 5px;
+    content: center;
+}
+
+.head{
+	content: center;
+}
+
+table{
+	position: relative;
+	top:10px;
+}
