@@ -22,7 +22,6 @@ function PERIODICA () //verifica se o usuário não excedeu o time out
     {
         if ((Users[x].validado==false) && ((agora - Users[x].timestamp) > TIMEOUT ) )
         {
-            console.log('remove usuario da lista de ativos')
             let MSG = {tipo:'ERRO',valor:'timeout'};
             Users[x].send(JSON.stringify(MSG));
             Users[x].close();
@@ -101,7 +100,6 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                 break;
             }
         }
-        console.log('Cliente desconectou');
 		userListUpdate();
     });
 
@@ -115,7 +113,6 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
 
             ws.nome = MSG.valor;
             ws.validado = true;
-			console.log('novo usuario');
             userListUpdate();
         }
         else if(MSG.tipo == 'CONVITE'){ //convite do usuário FROM para o usuário TO
@@ -153,29 +150,9 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/', function (req, resp)
-{
-    resp.write("teste");
-    resp.end();
-});
-
-app.get(/^(.+)$/, function (req, res)
-{
-    try
-    {
-        res.write("A pagina que vc busca nao existe")
-        res.end();
-    }
-    catch(e)
-    {
-        res.end();
-    }
-})
-
 app.listen(3000, function()
 {
     console.log('SERVIDOR WEB na porta 3000');
 });
-
 
 setInterval (PERIODICA,100);
