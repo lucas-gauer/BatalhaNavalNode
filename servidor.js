@@ -77,11 +77,21 @@ function criaTabuleiro(){ //cria um vetor que simula o tabuleiro para uma partid
 	}
     for(i = 0; i < 10; i++) {
         for(let j = 0; j < 10; j++){
-            tabuleiro[i][j] = i*10+j;
+            tabuleiro[i][j] = 0;
         }
         
     }
 	return tabuleiro;
+}
+
+function retorna_hit(i,j,player,j_index){
+    if(player == 1){
+        hit = Jogos[j_index].tabuleiro2[i][j];
+    }
+    else{
+        hit = Jogos[j_index].tabuleiro1[i][j];
+    }
+    return hit;
 }
 
 wss.on('connection', function connection(ws) //função do websocket ao receber uma nova conexão de cliente
@@ -128,17 +138,57 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                                 player2: MSG.valor.TO,
                                 tabuleiro1: tabuleiro1,
                                 tabuleiro2: tabuleiro2,
-                                vez: 1}
+                                vez: MSG.valor.FROM}
                 Jogos.push(partida);
-                let msg2 = {tipo: 'COMECO_JOGO', resposta: true}
+                let msg2 = {tipo: 'COMECO_JOGO', resposta: true, tabuleiro: tabuleiro1};
                 direct(MSG.valor.FROM, msg2);
+                let msg3 = {tipo: 'TABULEIRO', tabuleiro: tabuleiro2};
+                direct(MSG.valor.TO, msg3);
             }
             else{
                 console.log(""+MSG.valor.TO+" recusou o convite de "+MSG.valor.FROM);
-                let msg2 = {tipo: 'COMECO_JOGO', resposta: false}
+                let msg2 = {tipo: 'COMECO_JOGO', resposta: false};
                 direct(MSG.valor.FROM, msg2);
             }
 		}
+        else if(MSG.tipo == 'CASA'){
+            console.log('casa');
+            var hit = -1;
+            var vezDe;
+            for (let i = 0; i < Jogos.length; i++) {
+                if(ws.nome == Jogos[i].player1){
+                    if(ws.nome == Jogos[i].vez){
+                        hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,1,i);
+                        Jogos[i].vez = Jogos[i].player2;
+                        vezDe = Jogos[i].player2;
+                    }
+                }
+                else if(ws.nome == Jogos[i].player2){
+                    if(ws.nome == Jogos[i].vez){
+                        hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,2,i);
+                        Jogos[i].vez = Jogos[i].player1;
+                        vezDe = Jogos[i].player1;
+                    }
+                }
+            }
+            if(hit != -1){
+                let msg2 = {tipo: 'HIT', hit: hit};
+                direct(ws.nome, msg2);
+                let msg3 = {tipo: 'VEZ'};
+                direct(vezDe, msg3);
+            }
+        }
+        else if(MSG.tipo == 'TABULEIRO_UP'){
+            console.log(MSG.tabuleiro);
+            for (let i = 0; i < Jogos.length; i++) {
+                if(ws.nome == Jogos[i].player1){
+                    Jogos[i].tabuleiro1 = MSG.tabuleiro;
+                }
+                else if(ws.nome == Jogos[i].player2){
+                    Jogos[i].tabuleiro2 = MSG.tabuleiro;
+                }
+            }
+        }
         else{
             console.log('mensagem incomum')
         }

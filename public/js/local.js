@@ -3,6 +3,12 @@ var websocket;
 var meuID;
 var logUsers;
 var minhaVez = false;
+var alocar = false;
+var meuTabuleiro;
+var sentido = 0;
+var tamanhoBarcos = [5, 4, 3, 3, 2];
+var tb_index = 0;
+var hitX, hitY;
 
 function O(msg){
     return document.getElementById(msg)
@@ -14,11 +20,21 @@ O('blogin').addEventListener('click', function(){ //espera o click do botão log
 	O('blogin').style.visibility ='hidden'
 }, false);
 
+O('horizontal').addEventListener('click', function(){ //espera o click do botão login
+	sentido = 0;
+}, false);
+
+O('vertical').addEventListener('click', function(){ //espera o click do botão login
+	sentido = 1;
+}, false);
+
 function Clique(i,j){
-	console.log(i + ' ' + j)
+	console.log(i,j);
+	hitX = i;
+	hitY = j;
 	if (minhaVez) {
 		var request = {casaI: i, casaJ: j};
-   		websocket.send(JSON.stringify({tipo: "CONVITE", valor: request}));
+   		websocket.send(JSON.stringify({tipo: "CASA", valor: request}));
 	}
 }
 
@@ -37,8 +53,8 @@ window.onload = function() {
 		texto1 += '<tr>'
 		texto2 += '<tr>'
 		for(let j = 0; j < 10; j++){
-			texto1 += '<td><div class="casas" onclick="Clique('+(i-1)+','+j+')">hue</div></td>'
-			texto2 += '<td><div class="casas">hue</div></td>'
+			texto1 += '<td><div class="casas" onclick="alocarBarcos('+(i-1)+','+j+')" id="A'+(i-1)+''+j+'">hue</div></td>'
+			texto2 += '<td><div class="casas" onclick="Clique('+(i-1)+','+j+')" id="B'+(i-1)+''+j+'">hue</div></td>'
 		}
 		texto1 += '</tr>'
 		texto2 += '</tr>'
@@ -66,6 +82,71 @@ function userList(lista){ //escreve no html os users conectados e cria o botão 
         logUsers = texto;
     }
 }
+
+function atualizaTabuleiro(){
+	for(let i = 0; i < 10; i++){
+		for(let j = 0; j < 10; j++){
+			if(meuTabuleiro[i][j] == 0){
+				O('A'+i+j).style.backgroundColor = "blue";
+			}
+			if(meuTabuleiro[i][j] == 1){
+				O('A'+i+j).style.backgroundColor = "red";
+			}
+		}
+	}
+}
+
+function barcoHorizontal(i,j,tamanho){
+	if(j+tamanho <= 10){
+		for(let k = j; k < j + tamanho; k++){
+			meuTabuleiro[i][k] = 1;
+		}
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}
+
+function barcoVertical(i,j,tamanho){
+	if(i+tamanho <= 10){
+		for(let k = i; k < i + tamanho; k++){
+			meuTabuleiro[k][j] = 1;
+		}
+		return 1;
+	}
+	else{
+		return 0;
+	}
+}
+
+function alocarBarcos(i,j){
+	if(alocar){
+		var sucesso;
+		tamanho = tamanhoBarcos[tb_index];
+		if(sentido == 0){
+			sucesso = barcoHorizontal(i,j,tamanho);
+			if (sucesso == 1){
+				tb_index++;
+				atualizaTabuleiro();
+			}
+		}
+		else{
+			sucesso = barcoVertical(i,j,tamanho);
+			if (sucesso == 1){
+				atualizaTabuleiro();
+				tb_index++;
+			}
+		}
+		console.log(i,j);
+		if(tb_index == 5){
+			alocar = false;
+			let MSG = {tipo: 'TABULEIRO_UP', tabuleiro: meuTabuleiro};
+    		websocket.send(JSON.stringify(MSG))
+		}
+	}
+}
+
 //------------------------------------------------------------WS
 function envia(nick) { //inicia conexão com o servidor
      let dadosUsuario = {ID:nick};
@@ -122,6 +203,7 @@ function onMessage(evt) //ao receber mensagem
 		let msg2 = {tipo:'JOGO', player1: msg.valor.FROM, player2: msg.valor.TO, valor: msg.valor}
 		if(resp) {
 			msg2.valor.resp = true;
+			alocar = true;
 			alert("Vez do Oponente");            
 		} else {
 			msg2.valor.resp = false;
@@ -129,17 +211,38 @@ function onMessage(evt) //ao receber mensagem
 		websocket.send(JSON.stringify(msg2));
 		break;
 	case 'COMECO_JOGO':
-		console.log('COMECO_JOGO')
+		console.log('comeco_jogo');
 		if(msg.resposta){
-			alert('Seu convite foi aceito')
+			alert('Seu convite foi aceito');
+			meuTabuleiro = msg.tabuleiro;
+			alocar = true;
+			minhaVez = true;//--------------------------------------------------------------------------------------------------------------------
 		}
 		else{
 			alert('Seu convite não foi aceito')	
 		}
 		break;
+	case 'TABULEIRO':
+		console.log('tabuleiro');
+		meuTabuleiro = msg.tabuleiro;
+		alocar = true;
+		break;
+	case 'HIT':
+		minhaVez = false;
+		console.log('hit: ', msg.hit);
+		if(msg.hit == 1){
+			O('B'+(hitX)+''+hitY).style.backgroundColor = "red";
+		}
+		if(msg.hit == 0){
+			O('B'+(hitX)+''+hitY).style.backgroundColor = "blue";
+		}
+		break;
+	case 'VEZ':
+		minhaVez = true;
+		break;
 	default:
 		console.log('comando nao reconhecido: ' + msg.tipo);
 		break;
     }
-    console.log('OnMessage');
+    //console.log('OnMessage');
 }
