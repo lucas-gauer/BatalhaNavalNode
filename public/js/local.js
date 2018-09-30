@@ -53,8 +53,8 @@ window.onload = function() {
 		texto1 += '<tr>'
 		texto2 += '<tr>'
 		for(let j = 0; j < 10; j++){
-			texto1 += '<td><div class="casas" onclick="alocarBarcos('+(i-1)+','+j+')" id="A'+(i-1)+''+j+'">hue</div></td>'
-			texto2 += '<td><div class="casas" onclick="Clique('+(i-1)+','+j+')" id="B'+(i-1)+''+j+'">hue</div></td>'
+			texto1 += '<td><div class="casas" onclick="alocarBarcos('+(i-1)+','+j+')" id="A'+(i-1)+''+j+'"></div></td>'
+			texto2 += '<td><div class="casas" onclick="Clique('+(i-1)+','+j+')" id="B'+(i-1)+''+j+'"></div></td>'
 		}
 		texto1 += '</tr>'
 		texto2 += '</tr>'
@@ -89,8 +89,14 @@ function atualizaTabuleiro(){
 			if(meuTabuleiro[i][j] == 0){
 				O('A'+i+j).style.backgroundColor = "blue";
 			}
-			if(meuTabuleiro[i][j] == 1){
+			else if(meuTabuleiro[i][j] == 1){
 				O('A'+i+j).style.backgroundColor = "red";
+			}
+			else if(meuTabuleiro[i][j] == 2){
+				O('A'+i+j).style.backgroundColor = "black";
+			}
+			else if(meuTabuleiro[i][j] == 3){
+				O('A'+i+j).style.backgroundColor = "yellow";
 			}
 		}
 	}
@@ -238,6 +244,8 @@ function onMessage(evt) //ao receber mensagem
 		}
 		break;
 	case 'VEZ':
+		meuTabuleiro[msg.x][msg.y] = msg.hit + 2;
+		atualizaTabuleiro();
 		minhaVez = true;
 		break;
 	default:

@@ -26,23 +26,33 @@ div#lista{
 }
 
 div#inimigo{
-	left:497px;
+	left:508px;
+}
+
+button#horizontal{
+	position: relative;
+	top: 10px;
+}
+
+button#vertical{
+	position: relative;
+	top: 10px;
 }
 
 .tabuleiro{
-	top: 175px;
+	top: 185px;
 	position: absolute;
 	border: 1px solid #969696cc;
 	padding: 5px;
-    width: 400px;
+	padding-bottom: 15px;
     text-align: center;
 }
 
 .casas{
 	position: relative;
 	border: 1px solid #969696cc;
-	padding: 5px;
-    content: center;
+    width: 33px;
+    height: 33px;
 }
 
 .head{

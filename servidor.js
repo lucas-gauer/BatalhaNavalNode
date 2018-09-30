@@ -152,7 +152,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
             }
 		}
         else if(MSG.tipo == 'CASA'){
-            console.log('casa');
+            //console.log('casa');
             var hit = -1;
             var vezDe;
             for (let i = 0; i < Jogos.length; i++) {
@@ -174,7 +174,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
             if(hit != -1){
                 let msg2 = {tipo: 'HIT', hit: hit};
                 direct(ws.nome, msg2);
-                let msg3 = {tipo: 'VEZ'};
+                let msg3 = {tipo: 'VEZ', hit: hit, x: MSG.valor.casaI, y: MSG.valor.casaJ};
                 direct(vezDe, msg3);
             }
         }
