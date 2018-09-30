@@ -179,7 +179,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
             }
         }
         else if(MSG.tipo == 'TABULEIRO_UP'){
-            console.log(MSG.tabuleiro);
+            //console.log('tabuleiro_up');
             for (let i = 0; i < Jogos.length; i++) {
                 if(ws.nome == Jogos[i].player1){
                     Jogos[i].tabuleiro1 = MSG.tabuleiro;
