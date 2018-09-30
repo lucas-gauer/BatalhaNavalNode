@@ -7,7 +7,7 @@ var alocar = false;
 var meuTabuleiro;
 var sentido = 0;
 var tamanhoBarcos = [5, 4, 3, 3, 2];
-var tb_index = 0;
+var tb_index;
 var hitX, hitY;
 
 function O(msg){
@@ -209,6 +209,7 @@ function onMessage(evt) //ao receber mensagem
 		let msg2 = {tipo:'JOGO', player1: msg.valor.FROM, player2: msg.valor.TO, valor: msg.valor}
 		if(resp) {
 			msg2.valor.resp = true;
+			tb_index = 0;
 			alocar = true;
 			alert("Vez do Oponente");            
 		} else {
@@ -221,6 +222,7 @@ function onMessage(evt) //ao receber mensagem
 		if(msg.resposta){
 			alert('Seu convite foi aceito');
 			meuTabuleiro = msg.tabuleiro;
+			tb_index = 0;
 			alocar = true;
 			minhaVez = true;//--------------------------------------------------------------------------------------------------------------------
 		}
