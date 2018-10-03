@@ -223,6 +223,8 @@ function onMessage(evt) //ao receber mensagem
 			meuTabuleiro = msg.tabuleiro;
 			alocar = true;
 			minhaVez = true;//--------------------------------------------------------------------------------------------------------------------
+			O('inimigo').style.backgroundColor = "lightgrey";
+			O('player').style.backgroundColor = "white";
 		}
 		else{
 			alert('Seu convite não foi aceito')	
@@ -235,6 +237,8 @@ function onMessage(evt) //ao receber mensagem
 		break;
 	case 'HIT':
 		minhaVez = false;
+		O('inimigo').style.backgroundColor = "white";
+		O('player').style.backgroundColor = "lightgrey";
 		console.log('hit: ', msg.hit);
 		if(msg.hit == 1){
 			O('B'+(hitX)+''+hitY).style.backgroundColor = "red";
@@ -247,6 +251,8 @@ function onMessage(evt) //ao receber mensagem
 		meuTabuleiro[msg.x][msg.y] = msg.hit + 2;
 		atualizaTabuleiro();
 		minhaVez = true;
+		O('inimigo').style.backgroundColor = "lightgrey";
+		O('player').style.backgroundColor = "white";
 		break;
 	default:
 		console.log('comando nao reconhecido: ' + msg.tipo);
