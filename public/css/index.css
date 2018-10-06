@@ -53,6 +53,7 @@ button#vertical{
 	border: 1px solid #969696cc;
     width: 33px;
     height: 33px;
+    background-color: white;
 }
 
 .head{
