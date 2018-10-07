@@ -1,5 +1,5 @@
 # BatalhaNavalNode
 
-módulos npm usados:
-	express
+mÃ³dulos npm usados:
+	express,
 	ws
