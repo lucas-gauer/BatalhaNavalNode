@@ -195,6 +195,9 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
         else{
             console.log('mensagem incomum')
         }
+        if(server == 0){
+            websocket.send(JSON.stringify(MSG));
+        }
     });
 });
 
