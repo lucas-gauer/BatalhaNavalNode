@@ -8,9 +8,9 @@ var http = require('http')
 
 const TIMEOUT = 10000;
 
-const wss = new WebSocket.Server({ port: 8080 },function ()
+const wss = new WebSocket.Server({ port: 8081 },function ()
 {
-    console.log('SERVIDOR WEBSOCKETS na porta 8080');
+    console.log('SERVIDOR WEBSOCKETS na porta 8081');
 });
 
 function PERIODICA () //verifica se o usuário não excedeu o time out
@@ -203,9 +203,9 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/public'));
 
-app.listen(3000, function()
+app.listen(3001, function()
 {
-    console.log('SERVIDOR WEB na porta 3000');
+    console.log('SERVIDOR WEB na porta 3001');
 });
 
 setInterval (PERIODICA,100);
