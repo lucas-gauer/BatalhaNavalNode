@@ -5,14 +5,15 @@ const WebSocket = require('ws');
 var Users=[];
 var Jogos=[];
 var http = require('http');
-var server = 0; // 0 - master / 1 - slave
+var server = 0; // 0 - default / 1 - backup
 var websocket;
 
 const TIMEOUT = 10000;
 
-const wss = new WebSocket.Server({ port: 8080 },function ()
+const wss = new WebSocket.Server({ port: 8080+server},function ()
 {
-    console.log('SERVIDOR WEBSOCKETS na porta 8080');
+    let porta = 8080+server;
+    console.log('SERVIDOR WEBSOCKETS na porta '+porta);
 });
 
 function PERIODICA () //verifica se o usuário não excedeu o time out
@@ -37,8 +38,8 @@ function PERIODICA () //verifica se o usuário não excedeu o time out
 function userListUpdate() //atualiza os usuários nos cliente para possibilitar convites
 {
     var userList = [];
-	userList.push();
-    for(var i = 0; i < Users.length; i++){
+	//userList.push();
+    for(var i = 1; i < Users.length; i++){
 		if(Users[i].validado == true){    
 	        userList.push(Users[i].nome);
         }
@@ -205,26 +206,27 @@ app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/public'));
 
-app.listen(3000, function()
+app.listen(3000+server, function()
 {
-    console.log('SERVIDOR WEB na porta 3000');
+    let porta = 3000 + server;
+    console.log('SERVIDOR WEB na porta '+porta);
 });
 
 //---------------------------------------------------entre-server
 
 function start(){
-    if(server == 0){
-        console.log('MASTER SERVER');
+    if(server == 1){
+        console.log('BACKUP SERVER');
     }
-    else if(server == 1){
-        console.log('SLAVE SERVER');
-        startConnection('slave');
+    else if(server == 0){
+        console.log('DEFAULT SERVER');
+        startConnection('default');
     }
 }
 
 function startConnection(id)
 {
-    websocket = new WebSocket('ws://127.0.0.1:8080');
+    websocket = new WebSocket('ws://127.0.0.1:8081');
     websocket.onopen = function(evt)
     {
         onOpen(evt)
@@ -242,7 +244,7 @@ function startConnection(id)
 function onOpen(evt) //ao conectar
 {
     console.log('onOpen')
-    let MSG = {tipo: 'LOGIN', valor: 'slave'};
+    let MSG = {tipo: 'LOGIN', valor: 'default'};
     websocket.send(JSON.stringify(MSG))
 }
 
