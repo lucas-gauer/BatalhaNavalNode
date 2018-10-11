@@ -195,9 +195,6 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
         else{
             console.log('mensagem incomum')
         }
-        // confirmação de recebimento
-        let feedback = {tipo: 'ALIVE'};
-        direct(ws.nome, feedback);
     });
 });
 
@@ -255,7 +252,7 @@ function onClose(evt) //ao desconectar
 
 function onMessage(evt) //ao receber mensagem
 {
-    console.log('onMessage');
+    //console.log('onMessage');
     var msg = evt.data;
     msg = JSON.parse(msg);
     switch (msg.tipo)
@@ -264,5 +261,5 @@ function onMessage(evt) //ao receber mensagem
     }
 }
 
-setInterval(PERIODICA,100);
+setInterval(PERIODICA,1000);
 start();

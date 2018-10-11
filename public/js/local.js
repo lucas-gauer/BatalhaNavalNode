@@ -1,7 +1,6 @@
 var servidorWebserver = 'ws://' + window.location.hostname + ':8080';
 var websocket;
 var server = 0;
-var alive = false;
 var meuID;
 var logUsers;
 var minhaVez = false;
@@ -24,11 +23,6 @@ O('blogin').addEventListener('click', function(){ //espera o click do botão log
 
 O('horizontal').addEventListener('click', function(){ //espera o click do botão login
 	sentido = 0;
-	alive = false;
-	let hue = {};
-	hue.tipo = 'teste';
-	hue.valor = 5;
-	mensagem(hue);
 }, false);
 
 O('vertical').addEventListener('click', function(){ //espera o click do botão login
@@ -266,32 +260,9 @@ function onMessage(evt) //ao receber mensagem
 		O('inimigo').style.backgroundColor = "lightgrey";
 		O('player').style.backgroundColor = "white";
 		break;
-	case 'ALIVE':
-		console.log('alivou')
-		alive = true;
-		break;
 	default:
 		console.log('comando nao reconhecido: ' + msg.tipo);
 		break;
     }
     //console.log('OnMessage');
-}
-
-function mensagem(MSG){
-	//alive = false;
-	console.log('1 '+alive);
-	websocket.send(JSON.stringify(MSG));
-	console.log('2 '+alive);
-	//console.log(new Date().getTime());
-	sleep(2000);
-	console.log('3 '+alive);
-}
-
-function sleep(milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-            break;
-        }
-    }
 }
