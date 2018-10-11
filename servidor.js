@@ -4,7 +4,9 @@ var bodyParser = require('body-parser');
 const WebSocket = require('ws');
 var Users=[];
 var Jogos=[];
-var http = require('http')
+var http = require('http');
+var server = 0; // 0 - master / 1 - slave
+var websocket;
 
 const TIMEOUT = 10000;
 
@@ -208,4 +210,57 @@ app.listen(3000, function()
     console.log('SERVIDOR WEB na porta 3000');
 });
 
-setInterval (PERIODICA,100);
+//---------------------------------------------------entre-server
+
+function start(){
+    if(server == 0){
+        console.log('MASTER SERVER');
+    }
+    else if(server == 1){
+        console.log('SLAVE SERVER');
+        startConnection('slave');
+    }
+}
+
+function startConnection(id)
+{
+    websocket = new WebSocket('ws://127.0.0.1:8080');
+    websocket.onopen = function(evt)
+    {
+        onOpen(evt)
+    }
+    websocket.onclose = function(evt)
+    {
+        onClose(evt)
+    }
+    websocket.onmessage = function(evt)
+    {
+        onMessage(evt)
+    }
+}
+
+function onOpen(evt) //ao conectar
+{
+    console.log('onOpen')
+    let MSG = {tipo: 'LOGIN', valor: 'slave'};
+    websocket.send(JSON.stringify(MSG))
+}
+
+function onClose(evt) //ao desconectar
+{
+    console.log('onClose');
+}
+
+function onMessage(evt) //ao receber mensagem
+{
+    console.log('onMessage');
+    var msg = evt.data;
+    msg = JSON.parse(msg);
+    switch (msg.tipo)
+    {
+
+    }
+}
+
+setInterval(PERIODICA,100);
+start();
