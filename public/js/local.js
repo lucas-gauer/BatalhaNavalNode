@@ -172,7 +172,7 @@ function envia(nick) { //inicia conexão com o servidor
 function startConnection(id) //estabele as funções específicas do websocket
 {
     meuID = id;
-    websocket = new ReconnectingWebSocket(servidorWebserver)
+    websocket = new WebSocket(servidorWebserver)
     websocket.onopen = function(evt)
     {
         onOpen(evt)

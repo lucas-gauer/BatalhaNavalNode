@@ -39,8 +39,8 @@ function userListUpdate() //atualiza os usuários nos cliente para possibilitar 
 {
     var userList = [];
 	//userList.push();
-    for(var i = 1; i < Users.length; i++){
-		if(Users[i].validado == true){    
+    for(var i = 0; i < Users.length; i++){
+		if(Users[i].validado == true && Users[i].nome != 'default'){
 	        userList.push(Users[i].nome);
         }
     }
