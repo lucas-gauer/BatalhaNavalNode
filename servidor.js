@@ -164,6 +164,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                         hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,1,i);
                         Jogos[i].vez = Jogos[i].player2;
                         vezDe = Jogos[i].player2;
+                        jogaram(i);
                     }
                 }
                 else if(ws.nome == Jogos[i].player2){
@@ -171,6 +172,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                         hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,2,i);
                         Jogos[i].vez = Jogos[i].player1;
                         vezDe = Jogos[i].player1;
+                        jogaram(i);
                     }
                 }
             }
@@ -191,6 +193,15 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                     Jogos[i].tabuleiro2 = MSG.tabuleiro;
                 }
             }
+        }
+        //-----------------------------------------só entre servidor
+        else if(MSG.tipo == 'JOGARAM'){
+        	if(Jogos[MSG.jogo].vez == Jogos[MSG.jogo].player1){
+        		Jogos[MSG.jogo].vez = Jogos[MSG.jogo].player2;
+        	}
+        	else if(Jogos[MSG.jogo].vez == Jogos[MSG.jogo].player2){
+        		Jogos[MSG.jogo].vez = Jogos[MSG.jogo].player1;
+        	}
         }
         else{
             console.log('mensagem incomum')
@@ -262,6 +273,13 @@ function onMessage(evt) //ao receber mensagem
     {
 
     }
+}
+
+function jogaram(i){
+	if(server == 0){
+		let MSG = {tipo: 'JOGARAM', jogo: i};
+    	websocket.send(JSON.stringify(MSG))
+	}
 }
 
 setInterval(PERIODICA,1000);
