@@ -262,7 +262,7 @@ function onMessage(evt) //ao receber mensagem
 		O('player').style.backgroundColor = "white";
 		break;
 	case 'BACKUP':
-		backup_server = MSG.addr;
+		backup_server = msg.addr;
 		break;
 	default:
 		console.log('comando nao reconhecido: ' + msg.tipo);
