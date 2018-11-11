@@ -7,6 +7,7 @@ var Jogos=[];
 var http = require('http');
 var server = 0; // 0 - default / 1 - backup
 var websocket;
+var backup_server = 'ws://192.168.1.104:8081';
 
 const TIMEOUT = 10000;
 
@@ -124,6 +125,8 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                 console.log('ID=', MSG.valor)
                 ws.nome = MSG.valor;
                 ws.validado = true;
+                msg2 = {tipo = 'BACKUP', addr = backup_server}
+                direct(ws.nome, msg2);
                 userListUpdate();
             }
         }
@@ -241,7 +244,7 @@ function start(){
 
 function startConnection(id)
 {
-    websocket = new WebSocket('ws://127.0.0.1:8081');
+    websocket = new WebSocket(backup_server);
     websocket.onopen = function(evt)
     {
         onOpen(evt)

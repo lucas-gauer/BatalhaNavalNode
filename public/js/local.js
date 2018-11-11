@@ -10,6 +10,7 @@ var sentido = 0;
 var tamanhoBarcos = [5, 4, 3, 3, 2];
 var tb_index;
 var hitX, hitY;
+var backup_server;
 
 function O(msg){
     return document.getElementById(msg)
@@ -192,7 +193,7 @@ function onOpen(evt) //ao conectar
 function onClose(evt) //ao desconectar
 {
     console.log('onClose');
-    servidorWebserver = 'ws://' + window.location.hostname + ':8081';
+    servidorWebserver = backup_server;
     console.log(servidorWebserver);
     envia(meuID);
 }
@@ -259,6 +260,9 @@ function onMessage(evt) //ao receber mensagem
 		minhaVez = true;
 		O('inimigo').style.backgroundColor = "lightgrey";
 		O('player').style.backgroundColor = "white";
+		break;
+	case 'BACKUP':
+		backup_server = MSG.addr;
 		break;
 	default:
 		console.log('comando nao reconhecido: ' + msg.tipo);
