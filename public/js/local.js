@@ -148,7 +148,7 @@ function alocarBarcos(i,j){
 		console.log(i,j);
 		if(tb_index == 5){
 			alocar = false;
-			let MSG = {tipo: 'TABULEIRO_UP', tabuleiro: meuTabuleiro};
+			let MSG = {tipo: 'TABULEIRO_UP', tabuleiro: meuTabuleiro, player: meuID};
     		websocket.send(JSON.stringify(MSG))
 		}
 	}
@@ -158,7 +158,7 @@ function alocarBarcos(i,j){
 function envia(nick) { //inicia conexão com o servidor
      let dadosUsuario = {ID:nick};
      startConnection(dadosUsuario);
-     meuID = nick
+     meuID = nick;
      dadosUsuario = JSON.stringify(dadosUsuario);
      //localStorage.setItem('DADOS',dadosUsuario);
 }

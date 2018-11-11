@@ -19,7 +19,6 @@ const wss = new WebSocket.Server({ port: 8080+server},function ()
 function PERIODICA () //verifica se o usuário não excedeu o time out
 {
     let agora = Date.now();
-
     let x=0;
     while (x < Users.length)
     {
@@ -38,7 +37,6 @@ function PERIODICA () //verifica se o usuário não excedeu o time out
 function userListUpdate() //atualiza os usuários nos cliente para possibilitar convites
 {
     var userList = [];
-	//userList.push();
     for(var i = 0; i < Users.length; i++){
 		if(Users[i].validado == true && Users[i].nome != 'default'){
 	        userList.push(Users[i].nome);
@@ -56,7 +54,6 @@ function broadcast (msg){ //envia mensagem para todos os clientes conectados
                 Users[x].send(JSON.stringify(msg));
         }
         catch(e){
-
         }
     }
 }
@@ -68,7 +65,6 @@ function direct(para, msg) { //envia mensagem exclusiva para o cliente especific
 				Users[x].send(JSON.stringify(msg)); 
 			}
 		catch (e){
-			
 		}
 	}  
 }
@@ -82,7 +78,6 @@ function criaTabuleiro(){ //cria um vetor que simula o tabuleiro para uma partid
         for(let j = 0; j < 10; j++){
             tabuleiro[i][j] = 0;
         }
-        
     }
 	return tabuleiro;
 }
@@ -119,14 +114,18 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
     ws.on('message', function incoming(MSG) //função ativada por mensagens
     {
         MSG = JSON.parse(MSG);
+        console.log(MSG.tipo);
+        if(server == 0){
+            websocket.send(JSON.stringify(MSG));
+        }
         if (MSG.tipo=='LOGIN') //login de usuário
         {
-            //console.log(MSG.value)
-            console.log('ID=',MSG.valor)
-
-            ws.nome = MSG.valor;
-            ws.validado = true;
-            userListUpdate();
+            if(ws.nome != 'default'){
+                console.log('ID=', MSG.valor)
+                ws.nome = MSG.valor;
+                ws.validado = true;
+                userListUpdate();
+            }
         }
         else if(MSG.tipo == 'CONVITE'){ //convite do usuário FROM para o usuário TO
             console.log(""+MSG.valor.FROM+" está convidando "+MSG.valor.TO);
@@ -158,38 +157,40 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
             //console.log('casa');
             var hit = -1;
             var vezDe;
-            for (let i = 0; i < Jogos.length; i++) {
-                if(ws.nome == Jogos[i].player1){
-                    if(ws.nome == Jogos[i].vez){
-                        hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,1,i);
-                        Jogos[i].vez = Jogos[i].player2;
-                        vezDe = Jogos[i].player2;
-                        jogaram(i);
+            if(ws.nome != 'default'){
+                for(let i = 0; i < Jogos.length; i++){
+                    if(ws.nome == Jogos[i].player1){
+                        if(ws.nome == Jogos[i].vez){
+                            hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,1,i);
+                            Jogos[i].vez = Jogos[i].player2;
+                            vezDe = Jogos[i].player2;
+                            jogaram(i);
+                        }
+                    }
+                    else if(ws.nome == Jogos[i].player2){
+                        if(ws.nome == Jogos[i].vez){
+                            hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,2,i);
+                            Jogos[i].vez = Jogos[i].player1;
+                            vezDe = Jogos[i].player1;
+                            jogaram(i);
+                        }
                     }
                 }
-                else if(ws.nome == Jogos[i].player2){
-                    if(ws.nome == Jogos[i].vez){
-                        hit = retorna_hit(MSG.valor.casaI, MSG.valor.casaJ,2,i);
-                        Jogos[i].vez = Jogos[i].player1;
-                        vezDe = Jogos[i].player1;
-                        jogaram(i);
-                    }
+                if(hit != -1){
+                    let msg2 = {tipo: 'HIT', hit: hit};
+                    direct(ws.nome, msg2);
+                    let msg3 = {tipo: 'VEZ', hit: hit, x: MSG.valor.casaI, y: MSG.valor.casaJ};
+                    direct(vezDe, msg3);
                 }
-            }
-            if(hit != -1){
-                let msg2 = {tipo: 'HIT', hit: hit};
-                direct(ws.nome, msg2);
-                let msg3 = {tipo: 'VEZ', hit: hit, x: MSG.valor.casaI, y: MSG.valor.casaJ};
-                direct(vezDe, msg3);
             }
         }
         else if(MSG.tipo == 'TABULEIRO_UP'){
             //console.log('tabuleiro_up');
-            for (let i = 0; i < Jogos.length; i++) {
-                if(ws.nome == Jogos[i].player1){
+            for(let i = 0; i < Jogos.length; i++){
+                if(MSG.player == Jogos[i].player1){
                     Jogos[i].tabuleiro1 = MSG.tabuleiro;
                 }
-                else if(ws.nome == Jogos[i].player2){
+                else if(MSG.player == Jogos[i].player2){
                     Jogos[i].tabuleiro2 = MSG.tabuleiro;
                 }
             }
@@ -203,11 +204,14 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
         		Jogos[MSG.jogo].vez = Jogos[MSG.jogo].player1;
         	}
         }
+        else if(MSG.tipo == 'LOGIN2'){
+            console.log('LOGIN DE SERVER')
+            ws.nome = MSG.valor;
+            ws.validado = true;
+            userListUpdate();
+        }
         else{
             console.log('mensagem incomum')
-        }
-        if(server == 0){
-            websocket.send(JSON.stringify(MSG));
         }
     });
 });
@@ -255,7 +259,7 @@ function startConnection(id)
 function onOpen(evt) //ao conectar
 {
     console.log('onOpen')
-    let MSG = {tipo: 'LOGIN', valor: 'default'};
+    let MSG = {tipo: 'LOGIN2', valor: 'default'};
     websocket.send(JSON.stringify(MSG))
 }
 
