@@ -125,7 +125,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                 console.log('ID=', MSG.valor)
                 ws.nome = MSG.valor;
                 ws.validado = true;
-                msg2 = {tipo = 'BACKUP', addr = backup_server}
+                msg2 = {tipo: 'BACKUP', addr: backup_server}
                 direct(ws.nome, msg2);
                 userListUpdate();
             }
