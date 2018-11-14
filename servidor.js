@@ -7,7 +7,7 @@ var Jogos=[];
 var http = require('http');
 var server = 0; // 0 - default / 1 - backup
 var websocket;
-var backup_server = 'ws://192.168.1.104:8081';
+var backup_server = 'ws://192.168.1.104:8081'; // endereço do server secundário - de backup
 
 const TIMEOUT = 10000;
 
@@ -83,7 +83,7 @@ function criaTabuleiro(){ //cria um vetor que simula o tabuleiro para uma partid
 	return tabuleiro;
 }
 
-function retorna_hit(i,j,player,j_index){
+function retorna_hit(i,j,player,j_index){ //busca na matriz de tabuleiro a posição clicada pelo jogador e retorna o valor da casa
     if(player == 1){
         hit = Jogos[j_index].tabuleiro2[i][j];
     }
@@ -121,7 +121,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
         }
         if (MSG.tipo=='LOGIN') //login de usuário
         {
-            if(ws.nome != 'default'){
+            if(ws.nome != 'default'){ //default é o nome padrão do server primário
                 console.log('ID=', MSG.valor)
                 ws.nome = MSG.valor;
                 ws.validado = true;
@@ -134,7 +134,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
             console.log(""+MSG.valor.FROM+" está convidando "+MSG.valor.TO);
             direct(MSG.valor.TO, MSG);
         }
-		else if(MSG.tipo == 'JOGO'){
+		else if(MSG.tipo == 'JOGO'){ //cria o jogo em si após o convite ser aceitar ou retorna que o convite não foi aceito
             if(MSG.valor.resp == true) {
                 console.log(""+MSG.valor.TO+" aceitou o convite de "+MSG.valor.FROM);
                 tabuleiro1 = criaTabuleiro();
@@ -156,7 +156,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                 direct(MSG.valor.FROM, msg2);
             }
 		}
-        else if(MSG.tipo == 'CASA'){
+        else if(MSG.tipo == 'CASA'){ //recebe um request de jogada, analisa de quem é a vez e retorna a casa se válido
             //console.log('casa');
             var hit = -1;
             var vezDe;
@@ -187,7 +187,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                 }
             }
         }
-        else if(MSG.tipo == 'TABULEIRO_UP'){
+        else if(MSG.tipo == 'TABULEIRO_UP'){ //recebe os tabuleiros dos jogadores com todas as posições preenchidas
             //console.log('tabuleiro_up');
             for(let i = 0; i < Jogos.length; i++){
                 if(MSG.player == Jogos[i].player1){
@@ -198,8 +198,8 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
                 }
             }
         }
-        //-----------------------------------------só entre servidor
-        else if(MSG.tipo == 'JOGARAM'){
+        //-----------------------------------------só entre servidor - servidor secundário
+        else if(MSG.tipo == 'JOGARAM'){ //atualiza a vez
         	if(Jogos[MSG.jogo].vez == Jogos[MSG.jogo].player1){
         		Jogos[MSG.jogo].vez = Jogos[MSG.jogo].player2;
         	}
@@ -207,7 +207,7 @@ wss.on('connection', function connection(ws) //função do websocket ao receber 
         		Jogos[MSG.jogo].vez = Jogos[MSG.jogo].player1;
         	}
         }
-        else if(MSG.tipo == 'LOGIN2'){
+        else if(MSG.tipo == 'LOGIN2'){ //login de server primário no secundário
             console.log('LOGIN DE SERVER')
             ws.nome = MSG.valor;
             ws.validado = true;
@@ -230,7 +230,7 @@ app.listen(3000+server, function()
     console.log('SERVIDOR WEB na porta '+porta);
 });
 
-//---------------------------------------------------entre-server
+//---------------------------------------------------entre-server - websocket 2
 
 function start(){
     if(server == 1){
